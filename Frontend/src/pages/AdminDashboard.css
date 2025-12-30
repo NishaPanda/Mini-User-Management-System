@@ -22,7 +22,7 @@
     z-index: 1;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 6rem 2rem 2rem;
 }
 
 /* Header */
@@ -449,7 +449,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-content {
-        padding: 1rem;
+        padding: 6rem 1rem 1rem;
     }
 
     .dashboard-header {
