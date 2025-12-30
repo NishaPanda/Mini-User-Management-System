@@ -34,11 +34,11 @@ function App() {
           }
         />
 
-        {/* Protected Profile Route */}
+        {/* Protected Profile Route - Available for both users and admins */}
         <Route
           path="/profile"
           element={
-            <ProtectedRoute allowedRoles={['user']}>
+            <ProtectedRoute allowedRoles={['user', 'admin']}>
               <Profile />
             </ProtectedRoute>
           }
