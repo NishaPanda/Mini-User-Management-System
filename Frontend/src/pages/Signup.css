@@ -190,7 +190,8 @@
 
 .input-icon {
     position: absolute;
-    left: 1rem;
+    left: 1.25rem;
+    z-index: 2;
     width: 20px;
     height: 20px;
     color: #9ca3af;
@@ -201,7 +202,8 @@
 /* Form Input */
 .form-input {
     width: 100%;
-    padding: 0.875rem 1rem 0.875rem 3rem;
+    padding: 0.875rem 1rem 0.875rem 4rem !important;
+    box-sizing: border-box;
     font-size: 1rem;
     color: #1f2937;
     background: #f9fafb;
@@ -397,12 +399,13 @@
     }
 
     .form-input {
-        padding: 0.75rem 0.875rem 0.75rem 2.75rem;
+        padding: 0.75rem 0.875rem 0.75rem 3.5rem !important;
         font-size: 0.938rem;
     }
 
     .input-icon {
-        left: 0.875rem;
+        left: 1.125rem;
+        z-index: 2;
         width: 18px;
         height: 18px;
     }
