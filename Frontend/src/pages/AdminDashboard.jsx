@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AdminDashboard.css';
+import { API_BASE_URL } from '../config';
 
 import Navbar from '../components/Navbar';
 
@@ -29,27 +30,22 @@ const AdminDashboard = () => {
 
     const fetchUsers = async (currentPage) => {
         setLoading(true);
+        setError('');
         try {
-            const response = await fetch(`/api/admin/getallusers?page=${currentPage}&limit=10`, {
-                method: 'GET',
-                credentials: 'include'
+            const response = await axios.get(`${API_BASE_URL}/api/admin/getallusers?page=${currentPage}&limit=10`, {
+                withCredentials: true
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                setUsers(data.users);
-                setTotalPages(data.totalPages);
-                setTotalUsers(data.totalUsers);
-            } else {
-                setError(data.message || 'Failed to fetch users');
-                if (response.status === 401 || response.status === 403) {
-                    navigate('/login');
-                }
-            }
+            setUsers(response.data.users);
+            setTotalPages(response.data.totalPages);
+            setTotalUsers(response.data.totalUsers);
         } catch (err) {
             console.error('Error fetching users:', err);
-            setError('Unable to connect to server');
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                navigate('/login');
+            } else {
+                setError(err.response?.data?.message || 'Unable to connect to server');
+            }
         } finally {
             setLoading(false);
         }
@@ -80,23 +76,16 @@ const AdminDashboard = () => {
         setActionLoading(true);
         try {
             const endpoint = actionType === 'activate' ? 'activate' : 'deactivate';
-            const response = await fetch(`/api/admin/users/${selectedUser._id}/${endpoint}`, {
-                method: 'PATCH',
-                credentials: 'include'
+            const response = await axios.patch(`${API_BASE_URL}/api/admin/users/${selectedUser._id}/${endpoint}`, {}, {
+                withCredentials: true
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                showNotification(`User ${actionType}d successfully`, 'success');
-                fetchUsers(page); // Refresh list
-                closeModal();
-            } else {
-                showNotification(data.message || `Failed to ${actionType} user`, 'error');
-            }
+            showNotification(`User ${actionType}d successfully`, 'success');
+            fetchUsers(page); // Refresh list
+            closeModal();
         } catch (err) {
             console.error(`Error ${actionType}ing user:`, err);
-            showNotification(`Error: ${err.message}`, 'error');
+            showNotification(err.response?.data?.message || `Failed to ${actionType} user`, 'error');
         } finally {
             setActionLoading(false);
         }

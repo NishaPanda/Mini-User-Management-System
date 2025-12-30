@@ -10,7 +10,6 @@ async function getUserProfile(req,res){
         res.status(200).json({message:"User found",user:user});
     } catch (error) {
         res.status(500).json({message:"Internal server error"});
-        console.log(error);
     }
 }
 
@@ -36,7 +35,6 @@ async function updateUserProfile(req,res){
         res.status(200).json({message:"User updated successfully"});
     } catch (error) {
         res.status(500).json({message:"Internal server error"});
-        console.log(error);
     }
 }
 
@@ -64,7 +62,6 @@ async function ChangePassword(req,res){
         res.status(200).json({message:"Password changed successfully"});
     } catch (error) {
         res.status(500).json({message:"Internal server error"});
-        console.log(error);
     }
 }
 
