@@ -8,6 +8,8 @@ async function getAllUsersByPagination(req,res){
         const skip = (page - 1) * limit;
         const users = await userSchema.find()
         .select("-password")
+        .where("role")
+        .ne("admin")
         .skip(skip)
         .limit(limit)
         .sort({createdAt:-1});

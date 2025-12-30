@@ -1,9 +1,10 @@
 const express = require("express");
-const PORT =process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080;
 const authRouter = require("./Routers/auth.Router");
 const adminRouter = require("./Routers/admin.Router");
 const userRouter = require("./Routers/user.Router");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 
 const app = express();
@@ -13,7 +14,12 @@ dotenv.config();
 
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(cors(
+    {
+        origin: ["http://localhost:5173", "http://localhost:5174"],
+        credentials: true
+    }
+));
 
 const connectDB = require("./db/db");
 connectDB();
