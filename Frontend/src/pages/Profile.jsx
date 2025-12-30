@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { API_BASE_URL } from '../config';
+import Toast from '../components/Toast';
+import LoadingSpinner from '../components/LoadingSpinner';
 import './Profile.css';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const [toast, setToast] = useState({ show: false, message: '', type: '' });
 
     // Edit Profile State
     const [isEditing, setIsEditing] = useState(false);
@@ -30,16 +31,7 @@ const Profile = () => {
         fetchUserProfile();
     }, []);
 
-    // Clear messages after 5 seconds
-    useEffect(() => {
-        if (success || error) {
-            const timer = setTimeout(() => {
-                setSuccess('');
-                setError('');
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [success, error]);
+
 
     const fetchUserProfile = async () => {
         try {
@@ -55,7 +47,7 @@ const Profile = () => {
             setLoading(false);
         } catch (err) {
             console.error('Error fetching profile:', err);
-            setError('Failed to load profile data');
+            setToast({ show: true, message: 'Failed to load profile data', type: 'error' });
             setLoading(false);
         }
     };
@@ -70,11 +62,9 @@ const Profile = () => {
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
 
         if (!editForm.password) {
-            setError('Please enter your current password to save changes');
+            setToast({ show: true, message: 'Please enter your current password to save changes', type: 'error' });
             return;
         }
 
@@ -82,27 +72,25 @@ const Profile = () => {
             await axios.patch(`${API_BASE_URL}/api/user/profile`, editForm, {
                 withCredentials: true
             });
-            setSuccess('Profile updated successfully');
+            setToast({ show: true, message: 'Profile updated successfully', type: 'success' });
             setIsEditing(false);
             setEditForm(prev => ({ ...prev, password: '' }));
             fetchUserProfile(); // Refresh data
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to update profile');
+            setToast({ show: true, message: err.response?.data?.message || 'Failed to update profile', type: 'error' });
         }
     };
 
     const handleChangePassword = async (e) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
 
         if (passwordForm.newPassword.length < 6) {
-            setError('New password must be at least 6 characters');
+            setToast({ show: true, message: 'New password must be at least 6 characters', type: 'error' });
             return;
         }
 
         if (passwordForm.newPassword !== passwordForm.confirmNewPassword) {
-            setError('New passwords do not match');
+            setToast({ show: true, message: 'New passwords do not match', type: 'error' });
             return;
         }
 
@@ -113,11 +101,11 @@ const Profile = () => {
             }, {
                 withCredentials: true
             });
-            setSuccess('Password changed successfully');
+            setToast({ show: true, message: 'Password changed successfully', type: 'success' });
             setShowPasswordChange(false);
             setPasswordForm({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to change password');
+            setToast({ show: true, message: err.response?.data?.message || 'Failed to change password', type: 'error' });
         }
     };
 
@@ -128,25 +116,27 @@ const Profile = () => {
             email: user?.email || '',
             password: ''
         });
-        setError('');
     };
 
     const handleCancelPasswordChange = () => {
         setShowPasswordChange(false);
         setPasswordForm({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
-        setError('');
     };
 
     if (loading) {
-        return (
-            <div className="loading-screen">
-                <div className="spinner"></div>
-            </div>
-        );
+        return <LoadingSpinner fullScreen />;
     }
 
     return (
         <div className="profile-container">
+            {toast.show && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast({ show: false, message: '', type: '' })}
+                />
+            )}
+
             <Navbar />
             <div className="profile-background">
                 <div className="gradient-orb orb-1"></div>

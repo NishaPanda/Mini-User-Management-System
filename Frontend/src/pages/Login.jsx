@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Login.css';
 import { API_BASE_URL } from '../config';
+import Toast from '../components/Toast';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Login = () => {
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [toast, setToast] = useState({ show: false, message: '', type: '' });
 
     // Client-side validation
     const validateForm = () => {
@@ -61,6 +63,7 @@ const Login = () => {
 
         // Validate form
         if (!validateForm()) {
+            setToast({ show: true, message: 'Please fix the errors in the form', type: 'error' });
             return;
         }
         const email = e.target.email.value
@@ -76,16 +79,22 @@ const Login = () => {
             });
             console.log(response);
 
-            if (response.data.role === 'admin') {
-                navigate('/admin');
-            } else {
-                navigate('/dashboard');
-            }
+            setToast({ show: true, message: 'Login successful! Redirecting...', type: 'success' });
+
+            setTimeout(() => {
+                if (response.data.user.role === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/dashboard');
+                }
+            }, 1000);
 
         } catch (error) {
             console.error('Login error:', error);
             const errorResponse = error.response?.data;
-            setServerError(errorResponse?.message || 'Unable to connect to server. Please try again later.');
+            const errorMessage = errorResponse?.message || 'Unable to connect to server. Please try again later.';
+            setServerError(errorMessage);
+            setToast({ show: true, message: errorMessage, type: 'error' });
         } finally {
             setIsLoading(false);
         }
@@ -93,6 +102,14 @@ const Login = () => {
 
     return (
         <div className="login-container">
+            {toast.show && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast({ show: false, message: '', type: '' })}
+                />
+            )}
+
             <div className="login-background">
                 <div className="gradient-orb orb-1"></div>
                 <div className="gradient-orb orb-2"></div>

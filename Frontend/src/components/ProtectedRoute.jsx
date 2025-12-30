@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import LoadingSpinner from './LoadingSpinner';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const location = useLocation();
@@ -27,7 +28,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }, []);
 
     if (loading) {
-        return <div className="loading-screen"><div className="spinner"></div></div>;
+        return <LoadingSpinner fullScreen />;
     }
 
     if (!user) {
